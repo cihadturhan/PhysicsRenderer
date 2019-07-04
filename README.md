@@ -31,7 +31,7 @@ Because GPGPU Calculations are not something many developers are familiar with, 
 Also, at any point in time, jump straight over to the [Github] for the code! With all of this being said, lets start talking about how to use the Physics Renderer! If you want to know a bit more about how it actually works, check out the BACKGROUND section, but hopefully it is easy enough that you shouldn't *have* to know how crazy the gpgpu really gets!
 
 
-###Caveats
+### Caveats
 
 First things first, The PhysicsRenderer requires the use of Floating Point Textures. This is not something that is available ( *YET* ) in phones, so if you are trying to make a mobile friendly site, please run while you still can!
 
@@ -43,18 +43,18 @@ Fourth, for most of these examples, I will be using another Utility that I have 
 
 
 
-#Usage
+# Usage
 
-##Boring Setup Stuff:
+## Boring Setup Stuff:
 
-###Including Scripts
+### Including Scripts
 
 As usual, the first thing you need to do is include the script
 ```javascript
     <script src="PATH/TO/PhysicsRenderer.js"></script>
 ```
 
-###Initializing the PhysicsRenderer
+### Initializing the PhysicsRenderer
 
 Within the 'Initialization' phase of your application, create the renderer. To do this you will need 3 pieces of information:
 
@@ -81,7 +81,7 @@ Putting all these together the intialization looks a lil something like this:
     physicsRenderer = new PhysicsRenderer( size , simulationShader , renderer );
 ```
 
-###Updating the Renderer
+### Updating the Renderer
 Once its been initialized, all we have to do to use the renderer is update it in our animation loop, like so
 ```javascript
     physicsRenderer.update();
@@ -89,7 +89,7 @@ Once its been initialized, all we have to do to use the renderer is update it in
 
 If you do only these things, nothing is going to happen, and infact, you may get some errors, so lets dig a bit further and talk about what the simulation shader is going to look like:
 
-##Simulation Shader:
+## Simulation Shader:
 The simulation shader is the most important part of this tool, and everything else about the tool is just trying to get it to run. It will be written in GLSL, so we'll break it down by sections of the glsl program
 
 ### Uniforms
@@ -124,33 +124,33 @@ next we use our uv to look up the correct positions
   vec4 pos  = texture2D( t_pos  , uv );
 ```
 
-#####Velocity
+##### Velocity
 We can determine velocity from these two positions:
 ```glsl
 vec3 vel = pos.xyz - oPos.xyz;
 ```
 
-#####Force
+##### Force
 This is the section of the program which can be all you! For now, I'll show you the most basic example: Fake Gravity.
 
 ```glsl
 vec3 force = vec3( 0. , -1. , 0. );
 ```
 
-#####Getting New Position
+##### Getting New Position
 Using position, velocity and force, we can than get a new position, like so:
 ```glsl
 vel += force;
 vec3 newPos = pos.xyz + vel;
 ```
 
-#####Assigning New Position
+##### Assigning New Position
 Now that we've got a new position, all we have to do is assign it:
 ```glsl
 gl_FragColor = vec4( newPos , 1. );
 ```
 
-#####Putting it all together:
+##### Putting it all together:
 ```glsl
 uniform sampler2D t_pos; 
 uniform sampler2D t_oPos; 
@@ -175,11 +175,11 @@ void main(){
 }
 ```
 
-#####Going Further
+##### Going Further
 The above is just about the MOST basic example possible, but theres so many other fun things you can do! Add dampenign to the velocity, make it so particles respawn somewhere else, etc. etc. etc. Check out the examples to see all the weird ways you can make points move!!!
 
 
-##Using the Output
+## Using the Output
 Now that we've discussed how to create the PhysicsRenderer, and pass in a simulation shader that will do a bunch of awesome calculations for us, We need to know how to use it. This will require a few things: Creating a geometry that knows how to use the output textures, creating a Material that knows how to use the output textures, and binding the output texture. 
 
 ##### Creating a Geometry
@@ -213,7 +213,7 @@ Next We have to create a material that can use all of our data and create someth
 
 Lets break the material down into its seperate parts: The Uniforms, The Vertex Shader, and The Fragment Shader
 
-######Uniforms
+###### Uniforms
 The Uniforms will be like any other set of shader uniforms, with One mandatory addition, the positions texture that will come from the simulation shader. Because of this, the most basic uniforms will look like this:
 ```javascript
 var uniforms =  { 
@@ -221,7 +221,7 @@ var uniforms =  {
 }
 ```
 
-######Vertex Shader
+###### Vertex Shader
 The vertex shader will do nothing but use the position of the geometry to look up into the positions texture, and than place the particle based on this information:
 ```glsl
 uniform sampler2D t_pos;
@@ -234,7 +234,7 @@ void main(){
 }
 ```
 
-######Fragment Shader
+###### Fragment Shader
 The fragment shader than will look like any other fragment shader. All of the magic has already been done in the vertex shader:
 ```glsl
 void main(){
@@ -305,17 +305,17 @@ physicsRenderer.setUniforms( uniforms );
 ```
 Keep in mind, that because the PhysicsRenderer always needs t_pos , t_oPos , and resolution, even if you try to set these via this method, the PhysicsRenderer will override them!
 
-####Reseting Positions
+#### Reseting Positions
 You may want to place the particles at a certain place to start, because they will currently start all at [0,0,0]. This makes pretty much every simulation kindof boring, because you will only see 1 point... Because of this there are multiply ways to set positions:
 
-######Reseting position randomly
+###### Reseting position randomly
 The easiest way to get a quick feel for a simulation is to reset the positions randomly. This is done with a 1-liner
 ```javascript
 // Resets positions in a random box of side length 5
 physicsRenderer.resetRand( 5 );
 ```
 
-######Reseting Positions with another texture
+###### Reseting Positions with another texture
 You can also create a specific texture with position information and reset it this way. Altough the creation of the texture might be a bit more than one line, the call to reset using a texture is only:
 ```javascript
 var texture = createPositionTexture(size);
@@ -367,7 +367,7 @@ physicsRenderer.debugScene.scale.multiplyScalar( .1 );
 ## YOU MADE IT DOWN HERE!
 Thats alot of reading you've just done. Why don't you go play with some examples now, or let me know on [TWITTER] why everything I've said is wrong! If you want to keep learnign about the GPU, keep reading on for a bit of background!
 
-#Background
+# Background
 
 ### What are GPGPU Calculations ?!??!
 
